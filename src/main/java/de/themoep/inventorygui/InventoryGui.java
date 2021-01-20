@@ -101,6 +101,7 @@ public class InventoryGui implements Listener {
     private Map<UUID, Integer> pageNumbers = new LinkedHashMap<>();
     private Map<UUID, Integer> pageAmounts = new LinkedHashMap<>();
     private GuiElement.Action outsideAction = click -> false;
+    private GuiElement.Action playerInventoryAction = click -> false; // NahuLD: If true it will cancel the event.
     private CloseAction closeAction = close -> true;
     private boolean silent = false;
     
@@ -780,7 +781,15 @@ public class InventoryGui implements Listener {
     public void setOutsideAction(GuiElement.Action outsideAction) {
         this.outsideAction = outsideAction;
     }
-    
+
+    /**
+     * Set the action that is run when clicked an item from the player's inventory.
+     * @param playerInventoryAction The action run when the player clicks their inventory.
+     */
+    public void setPlayerInventoryAction(GuiElement.Action playerInventoryAction) {
+        this.playerInventoryAction = playerInventoryAction;
+    }
+
     /**
      * Get the action that is run when this GUI is closed
      * @return The action for when the player closes this inventory; can be null
@@ -941,6 +950,9 @@ public class InventoryGui implements Listener {
                     if (event.getAction() == InventoryAction.COLLECT_TO_CURSOR) {
                         simulateCollectToCursor(new GuiElement.Click(gui, slot, null, event));
                     }
+                    event.setCancelled(
+                        playerInventoryAction.onClick(new GuiElement.Click(gui, slot, null, event))
+                    );
                     return;
                 }
                 try {
